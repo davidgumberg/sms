@@ -73,8 +73,12 @@ class Miner:
     known_blocks: dict[str, Block]
     rejected_blocks: dict[str, Block]
 
+    # just for the stats
+    blocks_mined: int
+
     def __init__(self, name, initial_block: Block, hashrate_proportion: float):
         self.name = name
+        self.blocks_mined = 0
         self.current_block = initial_block
         self.hashrate_proportion = hashrate_proportion
         self.connections = []
@@ -118,6 +122,7 @@ class Miner:
             # print(f"{self.name} found a block at height: {found_block.height}")
 
     def announce(self, block: Block):
+        self.blocks_mined += 1
         for connection in self.connections:
             connection.queue_block(block)
 
@@ -197,7 +202,6 @@ def main(block_periods_to_simulate: int):
             miner.mine(t)
             
 
-    # TODO: this is ai-generated slop
     for i, miner in enumerate(miners):
         label = ["A (Attacker)", "B (Big guy)", "C (Crud)"][i]
         print(f"\nMiner {i} - {label}")
@@ -214,8 +218,14 @@ def main(block_periods_to_simulate: int):
             block = block.parent
         
         print(f"  Blocks by this miner in main chain: {blocks_in_chain}")
+        print(f"  Blocks found by this miner: {miner.blocks_mined}")
         if miner.current_block.height > 0:
             print(f"  Percentage of main chain: {blocks_in_chain / miner.current_block.height:.4%}")
+        stale_blocks = miner.blocks_mined - blocks_in_chain
+        stale_rate = stale_blocks / miner.blocks_mined
+        print(f"  Stale Blocks: {stale_blocks}")
+        print(f"  Stale rate: {stale_rate:.4f}")
+
 
 if __name__ == "__main__":
     import random
