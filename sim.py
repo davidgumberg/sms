@@ -35,17 +35,17 @@ class Connection:
         return self.receiver.receive_block(block)
         
     def tick(self):
-        self.blocks_to_send.sort(key=lambda entry: entry.block.height)
-        sent = []
+        if len(self.blocks_to_send) == 0:
+            return
+        remaining = []
         for entry in self.blocks_to_send:
             if entry.tts == 0:
                 self.send_block(entry.block)
-                sent.append(entry)
             else:
                 entry.tts -= 1
-        for s in sent:
-            self.blocks_to_send.remove(s)
-
+                remaining.append(entry)
+        
+        self.blocks_to_send = remaining
 
 class Block:
     height: int
