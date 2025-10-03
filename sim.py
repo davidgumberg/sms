@@ -81,13 +81,11 @@ class Miner:
         self.known_blocks = {initial_block.hash: initial_block}
         self.rejected_blocks = {}
         self.block_candidates = []
+        self.probability_per_second = self.hashrate_proportion * (1 - exp(-1/600))
 
     # Add connection to another miner with a given propagation delay.
     def add_connection(self, other: 'Miner', delay: int):
         self.connections.append(Connection(self, other, delay))
-
-    def probability_per_second(self) -> float:
-        return self.hashrate_proportion * (1 - exp(-1/600))
 
     def is_mine(self, block: Block):
         return block.miner == self
@@ -112,7 +110,7 @@ class Miner:
     def mine(self, time):
         if len(self.block_candidates) > 0:
             self.evaluate_candidates()
-        if random.random() < self.probability_per_second():
+        if random.random() < self.probability_per_second:
             found_block = Block(self.current_block.height + 1, time, self.current_block, self)
             self.known_blocks[found_block.hash] = found_block
             self.block_candidates.append(found_block)
