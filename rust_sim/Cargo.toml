@@ -1,0 +1,11 @@
+[package]
+name = "rust_sim"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+rand = "0.8"
+rand_xoshiro = "0.6"
+sha2 = "0.10"
+ahash = "0.8"
+
